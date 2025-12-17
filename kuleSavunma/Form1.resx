@@ -15231,6 +15231,9 @@
         QlVmy2Ly/33Z/ngze7ga/3S3+Pl+CRHnZvT5evr/AV0FKONe8+xmAAAAAElFTkSuQmCC
 </value>
   </data>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <data name="pictureBox5.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAK8AAADACAYAAAByMDP6AAAABGdBTUEAALGPC/xhBQAA9M5JREFUeF7s
@@ -16281,9 +16284,6 @@
         /927N/ofO/aJVf2lS3/Vy/fH8S9z/DektNRM2VarBwAAAABJRU5ErkJggg==
 </value>
   </data>
-  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <data name="pictureBox4.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAK8AAADACAYAAAByMDP6AAAABGdBTUEAALGPC/xhBQAA8dNJREFUeF7k
@@ -18377,13 +18377,16 @@
         AAAAAElFTkSuQmCC
 </value>
   </data>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>25</value>
   </metadata>
   <data name="$this.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAACKAAAAeACAYAAADzB73QAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vQAADr0BR/uQrQAA/7JJREFUeF50/YmzZdt21gfqDzB692Z3+r7dp+8z82RzTvb9ve8JATIVLgwCDBQY
+        vAAADrwBlbxySQAA/7JJREFUeF50/YmzZdt21gfqDzB692Z3+r7dp+8z82RzTvb9ve8JATIVLgwCDBQY
         YbtsAUJQlHGFy0JyySAIjEsiwKgCVYUKipCpImQhAYYSFBKyjCQUNM8S6kFPr7n9vbPi933jW2udfI+M
         mLn32Xv1e605xxzjN77xVZ988klL41//+lH76KMP2sefvN9a+1Cf8e/jjz/W64cf+jOWc/tE373//rvt
         ww9Zx9sabq811k3rt/f6ch9//GH76CNvc7idi397vx+3T7rG/6z7SfugNRb14l7no49b+7jfDpty898f

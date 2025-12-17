@@ -7,22 +7,20 @@ namespace kuleSavunma
 {
     public class TopKulesi : Kule
     {
-        public TopKulesi() : base(50, 100, 200) // Çok hasar, kısa menzil, pahalı
+        public TopKulesi() : base(50, 120, 250)
         {
             Resim = new PictureBox();
             Resim.Size = new Size(90, 90);
             Resim.SizeMode = PictureBoxSizeMode.StretchImage;
             Resim.BackColor = Color.Transparent;
-
-            // DÜZELTİLDİ: Gerçek isim
             Resim.Image = Properties.Resources.TopKulesi;
-
-            this.AtisHizi = 2000; // Çok yavaş vurur
+            this.AtisHizi = 3000;
         }
 
-        public override void Saldir(List<Canavar> canavarlar)
+        public override void Saldir(List<Canavar> canavarlar, List<AtisEfekti> efektler)
         {
             if ((DateTime.Now - SonAtisZamani).TotalMilliseconds < AtisHizi) return;
+            bool atisYapildi = false;
 
             foreach (Canavar c in canavarlar)
             {
@@ -31,10 +29,18 @@ namespace kuleSavunma
                 if (mesafe <= Menzil)
                 {
                     c.Can -= Hasar;
-                    SonAtisZamani = DateTime.Now;
-                    break;
+                    // KIRMIZI LAZER (Patlama)
+                    efektler.Add(new AtisEfekti
+                    {
+                        Baslangic = new Point(Resim.Left + 45, Resim.Top + 45),
+                        Bitis = new Point(c.Resim.Left + 20, c.Resim.Top + 20),
+                        Omur = 8,
+                        Renk = Color.OrangeRed
+                    });
+                    atisYapildi = true;
                 }
             }
+            if (atisYapildi) SonAtisZamani = DateTime.Now;
         }
     }
 }

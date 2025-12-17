@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing; // Çizim araçları
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace kuleSavunma
@@ -8,12 +8,15 @@ namespace kuleSavunma
     public partial class Form1 : Form
     {
         // ==================================================
-        // 1. OYUN DEĞİŞKENLERİ
+        // 1. DEĞİŞKENLER
         // ==================================================
         List<Point> yolNoktalari = new List<Point>();
         List<Canavar> canavarlar = new List<Canavar>();
         List<string> dalgaKuyrugu = new List<string>();
         List<Kule> kuleler = new List<Kule>();
+
+        // YENİ: Ekranda görünen mermi/lazer efektleri
+        List<AtisEfekti> aktifEfektler = new List<AtisEfekti>();
 
         System.Windows.Forms.Timer oyunTimer = new System.Windows.Forms.Timer();
         System.Windows.Forms.Timer dogmaTimer = new System.Windows.Forms.Timer();
@@ -26,23 +29,20 @@ namespace kuleSavunma
         int dalgaSayisi = 0;
         bool oyunBasladiMi = false;
 
-        string secilenKuleTuru = ""; // Dikmek için seçilen kule
-
-        // YENİ: Üzerine mouse ile gelinen dikili kule
+        string secilenKuleTuru = "";
         Kule hoverlananKule = null;
 
         public Form1()
         {
             InitializeComponent();
-            this.DoubleBuffered = true; // Titremeyi önle
+            this.DoubleBuffered = true; // Titremeyi önler
         }
 
         // ==================================================
-        // 2. OYUN BAŞLANGICI
+        // 2. YÜKLEME VE ÇİZİM (PAINT)
         // ==================================================
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Olayları Bağla
             this.MouseMove += new MouseEventHandler(Form1_MouseMove);
             this.Paint += new PaintEventHandler(Form1_Paint);
 
@@ -68,7 +68,6 @@ namespace kuleSavunma
             yolNoktalari.Add(new Point(453, 549));
             yolNoktalari.Add(new Point(444, 694));
 
-            // Başlangıç
             oyuncuCan = baslangicCani;
             oyuncuPara = baslangicParasi;
             ArayuzGuncelle();
@@ -80,143 +79,108 @@ namespace kuleSavunma
             dogmaTimer.Tick += DogmaTimer_Tick;
         }
 
-        // ==================================================
-        // 3. ÇİZİM VE MENZİL GÖSTERGESİ (GÜNCELLENDİ) 🎨
-        // ==================================================
-
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
-            // Mouse hareket ettikçe ekranı yenile (Daire takibi için)
             if (secilenKuleTuru != "") this.Invalidate();
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            // SENARYO 1: Yeni Kule Dikerken (BEYAZ DAİRE)
+            Graphics g = e.Graphics;
+
+            // 1. MENZİL GÖSTERGELERİ
             if (secilenKuleTuru != "")
             {
-                int menzil = 0;
-                if (secilenKuleTuru == "OkKulesi") menzil = 150;
-                else if (secilenKuleTuru == "BuyuKulesi") menzil = 120; // Varsa
-                else if (secilenKuleTuru == "TopKulesi") menzil = 100; // Varsa
+                int menzil = (secilenKuleTuru == "OkKulesi") ? 150 : (secilenKuleTuru == "BuyuKulesi" ? 120 : 100);
+                Point mouseYeri = this.PointToClient(Cursor.Position);
+                MenzilCiz(g, mouseYeri, menzil, Color.White);
+            }
+            if (hoverlananKule != null)
+            {
+                Point kuleMerkezi = new Point(hoverlananKule.Resim.Location.X + 45, hoverlananKule.Resim.Location.Y + 45);
+                MenzilCiz(g, kuleMerkezi, hoverlananKule.Menzil, Color.Cyan);
+            }
 
-                if (menzil > 0)
+            // 2. YENİ: SALDIRI EFEKTLERİNİ ÇİZ (Sarı Lazer)
+            using (Pen lazerKalemi = new Pen(Color.Yellow, 3))
+            {
+                foreach (var efekt in aktifEfektler)
                 {
-                    Point mouseYeri = this.PointToClient(Cursor.Position);
-                    MenzilCiz(e.Graphics, mouseYeri, menzil, Color.White);
+                    g.DrawLine(lazerKalemi, efekt.Baslangic, efekt.Bitis);
                 }
             }
 
-            // SENARYO 2: Dikili Kuleye Bakarken (MAVİ DAİRE)
-            if (hoverlananKule != null)
+            // 3. YENİ: CAN BARLARINI ÇİZ
+            foreach (var c in canavarlar)
             {
-                // Kulenin tam ortasını bul (Kule 90x90 olduğu için yarısı 45)
-                Point kuleMerkezi = new Point(
-                    hoverlananKule.Resim.Location.X + 45,
-                    hoverlananKule.Resim.Location.Y + 45
-                );
+                // Canavarın hemen üstüne
+                int barX = c.Resim.Location.X;
+                int barY = c.Resim.Location.Y - 10;
+                int barGenislik = c.Resim.Width;
+                int barYukseklik = 5;
 
-                // Mavi renkle çiz
-                MenzilCiz(e.Graphics, kuleMerkezi, hoverlananKule.Menzil, Color.Cyan);
+                // Arkaplan (Kırmızı)
+                g.FillRectangle(Brushes.Red, barX, barY, barGenislik, barYukseklik);
+
+                // Kalan Can (Yeşil)
+                float oran = (float)c.Can / (float)c.BaslangicCani;
+                if (oran < 0) oran = 0;
+                int yesilGenislik = (int)(barGenislik * oran);
+
+                g.FillRectangle(Brushes.LimeGreen, barX, barY, yesilGenislik, barYukseklik);
+
+                // İnce siyah çerçeve
+                g.DrawRectangle(Pens.Black, barX, barY, barGenislik, barYukseklik);
             }
         }
 
-        // Yardımcı Çizim Metodu (Kod tekrarını önlemek için)
         private void MenzilCiz(Graphics g, Point merkez, int menzil, Color renk)
         {
             Pen kalem = new Pen(renk, 2);
-            kalem.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash; // Kesik çizgi
-
-            // Yarı saydam dolgu rengi
+            kalem.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
             SolidBrush firca = new SolidBrush(Color.FromArgb(60, renk.R, renk.G, renk.B));
-
             Rectangle alan = new Rectangle(merkez.X - menzil, merkez.Y - menzil, menzil * 2, menzil * 2);
-
-            g.FillEllipse(firca, alan); // İçini boya
-            g.DrawEllipse(kalem, alan); // Çerçeve çiz
+            g.FillEllipse(firca, alan);
+            g.DrawEllipse(kalem, alan);
         }
 
         // ==================================================
-        // 4. KULE DİKME VE ETKİLEŞİM
-        // ==================================================
-
-        private void btnKuleOkcu_Click(object sender, EventArgs e) { KuleSec("OkKulesi"); }
-        private void btnKuleBuyu_Click(object sender, EventArgs e) { KuleSec("BuyuKulesi"); }
-        private void btnKuleTop_Click(object sender, EventArgs e) { KuleSec("TopKulesi"); }
-
-        private void KuleSec(string tur)
-        {
-            secilenKuleTuru = tur;
-            this.Cursor = Cursors.Hand;
-        }
-
-        private void Form1_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (secilenKuleTuru == "") return;
-
-            Kule yeniKule = null;
-
-            // Fiyat ve Tür Kontrolü
-            if (secilenKuleTuru == "OkKulesi" && oyuncuPara >= 100) yeniKule = new OkKulesi();
-            else if (secilenKuleTuru == "BuyuKulesi" && oyuncuPara >= 150) yeniKule = new BuyuKulesi();
-            else if (secilenKuleTuru == "TopKulesi" && oyuncuPara >= 200) yeniKule = new TopKulesi();
-
-            if (yeniKule != null)
-            {
-                // Yerleştir
-                yeniKule.Resim.Location = new Point(e.X - 45, e.Y - 45);
-                this.Controls.Add(yeniKule.Resim);
-                yeniKule.Resim.BringToFront();
-                kuleler.Add(yeniKule);
-
-                // --- İŞTE SİHİR BURADA: Kuleye dedektör takıyoruz ---
-                // Mouse üzerine gelince:
-                yeniKule.Resim.MouseEnter += (s, args) => {
-                    hoverlananKule = yeniKule; // Bu kuleyi işaretle
-                    this.Invalidate();         // Çizimi tetikle
-                };
-
-                // Mouse üzerinden gidince:
-                yeniKule.Resim.MouseLeave += (s, args) => {
-                    hoverlananKule = null;     // İşareti kaldır
-                    this.Invalidate();         // Çizimi temizle
-                };
-                // ----------------------------------------------------
-
-                oyuncuPara -= yeniKule.Fiyat;
-                ArayuzGuncelle();
-
-                secilenKuleTuru = "";
-                this.Cursor = Cursors.Default;
-                this.Invalidate();
-            }
-            else
-            {
-                MessageBox.Show("Yeterli paran yok!");
-                secilenKuleTuru = "";
-                this.Cursor = Cursors.Default;
-                this.Invalidate();
-            }
-        }
-
-        // ==================================================
-        // 5. OYUN MOTORU (AYNI)
+        // 3. OYUN MANTIĞI (GÜNCELLENDİ)
         // ==================================================
         private void OyunTimer_Tick(object sender, EventArgs e)
         {
-            foreach (var kule in kuleler) kule.Saldir(canavarlar);
+            // A. KULELER SALDIRSIN
+            foreach (var kule in kuleler)
+            {
+                // Artık efekt listesini de gönderiyoruz
+                kule.Saldir(canavarlar, aktifEfektler);
+            }
 
+            // B. EFEKTLERİ TEMİZLE (Kısa süre sonra kaybolsunlar)
+            for (int i = aktifEfektler.Count - 1; i >= 0; i--)
+            {
+                aktifEfektler[i].Omur--;
+                if (aktifEfektler[i].Omur <= 0) aktifEfektler.RemoveAt(i);
+            }
+
+            // C. CANAVARLAR
             for (int i = canavarlar.Count - 1; i >= 0; i--)
             {
                 Canavar c = canavarlar[i];
+
+                // ÖLÜM KONTROLÜ
                 if (c.Can <= 0)
                 {
+                    // ALTIN BUG'I ÇÖZÜMÜ: Sadece burada ve bir kere eklenir.
                     oyuncuPara += c.AltinDegeri;
+
                     this.Controls.Remove(c.Resim);
                     canavarlar.RemoveAt(i);
                     ArayuzGuncelle();
                     continue;
                 }
+
+                // HAREKET
                 if (c.HedefNoktaIndeksi >= yolNoktalari.Count)
                 {
                     oyuncuCan--;
@@ -231,10 +195,13 @@ namespace kuleSavunma
                 Point hedef = yolNoktalari[c.HedefNoktaIndeksi];
                 if (c.Resim.Left < hedef.X) c.Resim.Left += c.Hiz; else if (c.Resim.Left > hedef.X) c.Resim.Left -= c.Hiz;
                 if (c.Resim.Top < hedef.Y) c.Resim.Top += c.Hiz; else if (c.Resim.Top > hedef.Y) c.Resim.Top -= c.Hiz;
-
                 if (Math.Abs(c.Resim.Left - hedef.X) < 15 && Math.Abs(c.Resim.Top - hedef.Y) < 15) c.HedefNoktaIndeksi++;
             }
 
+            // Ekrana çizilenleri (Lazer, Can Barı) yenilemek için
+            this.Invalidate();
+
+            // D. DALGA
             if (dalgaKuyrugu.Count == 0 && canavarlar.Count == 0 && oyunBasladiMi)
             {
                 if (dalgaSayisi < 6) DalgaBaslat(dalgaSayisi + 1);
@@ -243,20 +210,62 @@ namespace kuleSavunma
         }
 
         // ==================================================
-        // 6. YARDIMCI METOTLAR
+        // 4. ETKİLEŞİM VE YARDIMCI METOTLAR
         // ==================================================
+        private void btnKuleOkcu_Click(object sender, EventArgs e) { KuleSec("OkKulesi"); }
+        private void btnKuleBuyu_Click(object sender, EventArgs e) { KuleSec("BuyuKulesi"); }
+        private void btnKuleTop_Click(object sender, EventArgs e) { KuleSec("TopKulesi"); }
+        private void KuleSec(string tur) { secilenKuleTuru = tur; this.Cursor = Cursors.Hand; }
+
+        private void Form1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (secilenKuleTuru == "") return;
+            Kule yeniKule = null;
+            if (secilenKuleTuru == "OkKulesi" && oyuncuPara >= 100) yeniKule = new OkKulesi();
+            else if (secilenKuleTuru == "BuyuKulesi" && oyuncuPara >= 150) yeniKule = new BuyuKulesi();
+            else if (secilenKuleTuru == "TopKulesi" && oyuncuPara >= 200) yeniKule = new TopKulesi();
+
+            if (yeniKule != null)
+            {
+                yeniKule.Resim.Location = new Point(e.X - 45, e.Y - 45);
+                this.Controls.Add(yeniKule.Resim);
+                yeniKule.Resim.BringToFront();
+                kuleler.Add(yeniKule);
+
+                yeniKule.Resim.MouseEnter += (s, args) => { hoverlananKule = yeniKule; this.Invalidate(); };
+                yeniKule.Resim.MouseLeave += (s, args) => { hoverlananKule = null; this.Invalidate(); };
+
+                oyuncuPara -= yeniKule.Fiyat;
+                ArayuzGuncelle();
+                secilenKuleTuru = "";
+                this.Cursor = Cursors.Default;
+                this.Invalidate();
+            }
+            else
+            {
+                MessageBox.Show("Yeterli paran yok!");
+                secilenKuleTuru = "";
+                this.Cursor = Cursors.Default;
+                this.Invalidate();
+            }
+        }
+
         private void btnBaslat_Click(object sender, EventArgs e)
         {
             if (!oyunBasladiMi)
             {
                 oyunBasladiMi = true;
+
+                // ALTIN HATASI ÇÖZÜMÜ: Başlarken kesinlikle 600'e sabitliyoruz.
                 oyuncuCan = baslangicCani;
                 oyuncuPara = baslangicParasi;
                 dalgaSayisi = 0;
+
                 foreach (var c in canavarlar) this.Controls.Remove(c.Resim);
                 canavarlar.Clear();
                 dalgaKuyrugu.Clear();
-                // Kuleler silinmiyor
+                aktifEfektler.Clear(); // Efektleri de temizle
+
                 ArayuzGuncelle();
                 btnBaslat.Visible = false;
                 oyunTimer.Start();
@@ -305,12 +314,17 @@ namespace kuleSavunma
             try { lblCan.Text = oyuncuCan.ToString(); lblPara.Text = oyuncuPara.ToString(); lblDalga.Text = dalgaSayisi.ToString(); } catch { }
         }
 
-        // --- TASARIM İÇİN BOŞ METOTLAR (SİLME) ---
+        // --- BOŞ METOTLAR (SİLME) ---
         private void panel1_Paint(object sender, PaintEventArgs e) { }
         private void panel2_Paint(object sender, PaintEventArgs e) { }
         private void label1_Click(object sender, EventArgs e) { }
         private void label3_Click(object sender, EventArgs e) { }
         private void panel4_Paint(object sender, PaintEventArgs e) { }
         private void label2_Click(object sender, EventArgs e) { }
+
+        private void label1_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

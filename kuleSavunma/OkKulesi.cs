@@ -13,14 +13,11 @@ namespace kuleSavunma
             Resim.Size = new Size(90, 90);
             Resim.SizeMode = PictureBoxSizeMode.StretchImage;
             Resim.BackColor = Color.Transparent;
-
-            // DÜZELTİLDİ: Gerçek isim
             Resim.Image = Properties.Resources.OkKulesi;
-
             this.AtisHizi = 1000;
         }
 
-        public override void Saldir(List<Canavar> canavarlar)
+        public override void Saldir(List<Canavar> canavarlar, List<AtisEfekti> efektler)
         {
             if ((DateTime.Now - SonAtisZamani).TotalMilliseconds < AtisHizi) return;
 
@@ -32,6 +29,15 @@ namespace kuleSavunma
                 {
                     c.Can -= Hasar;
                     SonAtisZamani = DateTime.Now;
+
+                    // SARI LAZER
+                    efektler.Add(new AtisEfekti
+                    {
+                        Baslangic = new Point(Resim.Left + 45, Resim.Top + 45),
+                        Bitis = new Point(c.Resim.Left + (c.Resim.Width / 2), c.Resim.Top + (c.Resim.Height / 2)),
+                        Omur = 5,
+                        Renk = Color.Yellow // <-- Renk atadık
+                    });
                     break;
                 }
             }

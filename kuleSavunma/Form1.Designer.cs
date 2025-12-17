@@ -39,6 +39,7 @@
             lblDalga = new Label();
             label3 = new Label();
             panel3 = new Panel();
+            lblSkor = new Label();
             label4 = new Label();
             panel4 = new Panel();
             pictureBox5 = new PictureBox();
@@ -163,11 +164,25 @@
             panel3.BackColor = Color.White;
             panel3.BackgroundImage = (Image)resources.GetObject("panel3.BackgroundImage");
             panel3.BackgroundImageLayout = ImageLayout.Stretch;
+            panel3.Controls.Add(lblSkor);
             panel3.Controls.Add(label4);
             panel3.Location = new Point(49, 82);
             panel3.Name = "panel3";
             panel3.Size = new Size(138, 35);
             panel3.TabIndex = 2;
+            // 
+            // lblSkor
+            // 
+            lblSkor.AutoSize = true;
+            lblSkor.BackColor = Color.Transparent;
+            lblSkor.Font = new Font("Stencil", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblSkor.ForeColor = SystemColors.Control;
+            lblSkor.Location = new Point(70, 9);
+            lblSkor.Name = "lblSkor";
+            lblSkor.Size = new Size(29, 20);
+            lblSkor.TabIndex = 3;
+            lblSkor.Text = "12";
+            lblSkor.Click += label1_Click_1;
             // 
             // label4
             // 
@@ -295,5 +310,6 @@
         private ToolTip toolTip1;
         private Label lblDalga;
         private Button btnBaslat;
+        private Label lblSkor;
     }
 }

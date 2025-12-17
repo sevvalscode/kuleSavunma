@@ -47,6 +47,7 @@
             pictureBox3 = new PictureBox();
             toolTip1 = new ToolTip(components);
             btnBaslat = new Button();
+            pictureBox6 = new PictureBox();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -56,6 +57,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
             SuspendLayout();
             // 
             // panel1
@@ -200,12 +202,13 @@
             // panel4
             // 
             panel4.BackColor = Color.Transparent;
+            panel4.Controls.Add(pictureBox6);
             panel4.Controls.Add(pictureBox5);
             panel4.Controls.Add(pictureBox4);
             panel4.Controls.Add(pictureBox3);
-            panel4.Location = new Point(31, 632);
+            panel4.Location = new Point(21, 632);
             panel4.Name = "panel4";
-            panel4.Size = new Size(280, 77);
+            panel4.Size = new Size(339, 77);
             panel4.TabIndex = 3;
             panel4.Paint += panel4_Paint;
             // 
@@ -255,6 +258,18 @@
             btnBaslat.UseVisualStyleBackColor = true;
             btnBaslat.Click += btnBaslat_Click;
             // 
+            // pictureBox6
+            // 
+            pictureBox6.BackgroundImage = (Image)resources.GetObject("pictureBox6.BackgroundImage");
+            pictureBox6.BackgroundImageLayout = ImageLayout.Zoom;
+            pictureBox6.Location = new Point(275, 3);
+            pictureBox6.Name = "pictureBox6";
+            pictureBox6.Size = new Size(74, 70);
+            pictureBox6.TabIndex = 3;
+            pictureBox6.TabStop = false;
+            toolTip1.SetToolTip(pictureBox6, "Lazer Kulesi (250 Altın)");
+            pictureBox6.Click += pictureBox6_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -289,6 +304,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
             ResumeLayout(false);
         }
 
@@ -311,5 +327,6 @@
         private Label lblDalga;
         private Button btnBaslat;
         private Label lblSkor;
+        private PictureBox pictureBox6;
     }
 }

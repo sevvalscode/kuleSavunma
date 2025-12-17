@@ -31,6 +31,7 @@ namespace kuleSavunma
 
         string secilenKuleTuru = "";
         Kule hoverlananKule = null;
+        int skor = 0; // Skor değişkeni
 
         public Form1()
         {
@@ -81,7 +82,12 @@ namespace kuleSavunma
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (secilenKuleTuru != "") this.Invalidate();
+            // Sadece bir kule seçiliyse ekranı yenile, aksi takdirde işlem yapma.
+            // Ayrıca performans için sadece kule yerleştirme modundayken çalışsın.
+            if (secilenKuleTuru != "")
+            {
+                this.Invalidate();
+            }
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -101,10 +107,12 @@ namespace kuleSavunma
                 MenzilCiz(g, kuleMerkezi, hoverlananKule.Menzil, Color.Cyan);
             }
 
-            // 2. YENİ: SALDIRI EFEKTLERİNİ ÇİZ (Sarı Lazer)
-            using (Pen lazerKalemi = new Pen(Color.Yellow, 3))
+
+            // GÜNCEL KOD (Her efektin kendi rengini kullanır)
+            foreach (var efekt in aktifEfektler)
             {
-                foreach (var efekt in aktifEfektler)
+                // efekt.Renk özelliğini kullanarak kalemi oluşturuyoruz
+                using (Pen lazerKalemi = new Pen(efekt.Renk, 3))
                 {
                     g.DrawLine(lazerKalemi, efekt.Baslangic, efekt.Bitis);
                 }
@@ -173,6 +181,7 @@ namespace kuleSavunma
                 {
                     // ALTIN BUG'I ÇÖZÜMÜ: Sadece burada ve bir kere eklenir.
                     oyuncuPara += c.AltinDegeri;
+                    skor += 10;
 
                     this.Controls.Remove(c.Resim);
                     canavarlar.RemoveAt(i);
@@ -241,6 +250,10 @@ namespace kuleSavunma
                 this.Cursor = Cursors.Default;
                 this.Invalidate();
             }
+            else if (secilenKuleTuru == "LazerKulesi" && oyuncuPara >= 250)
+            {
+                yeniKule = new LazerKulesi();
+            }
             else
             {
                 MessageBox.Show("Yeterli paran yok!");
@@ -256,15 +269,33 @@ namespace kuleSavunma
             {
                 oyunBasladiMi = true;
 
-                // ALTIN HATASI ÇÖZÜMÜ: Başlarken kesinlikle 600'e sabitliyoruz.
-                oyuncuCan = baslangicCani;
-                oyuncuPara = baslangicParasi;
+                // --- DÜZELTME BAŞLANGICI ---
+                // Eğer bu bir "YENİDEN BAŞLATMA" ise her şeyi sıfırla.
+                if (btnBaslat.Text == "TEKRAR DENE" || btnBaslat.Text == "YENİDEN OYNA")
+                {
+                    oyuncuCan = baslangicCani;
+                    oyuncuPara = baslangicParasi;
+
+                    // Yeniden başlatırken ekrandaki eski kuleleri de silmeliyiz!
+                    foreach (var kule in kuleler)
+                    {
+                        this.Controls.Remove(kule.Resim);
+                    }
+                    kuleler.Clear();
+                }
+                else
+                {
+                    // Oyun İLK KEZ başlıyorsa parayı SIFIRLAMA. 
+                    // Kullanıcı kule koyup parayı harcamış olabilir, olduğu gibi kalsın.
+                }
+                // --- DÜZELTME BİTİŞİ ---
+
                 dalgaSayisi = 0;
 
                 foreach (var c in canavarlar) this.Controls.Remove(c.Resim);
                 canavarlar.Clear();
                 dalgaKuyrugu.Clear();
-                aktifEfektler.Clear(); // Efektleri de temizle
+                aktifEfektler.Clear();
 
                 ArayuzGuncelle();
                 btnBaslat.Visible = false;
@@ -311,7 +342,14 @@ namespace kuleSavunma
 
         private void ArayuzGuncelle()
         {
-            try { lblCan.Text = oyuncuCan.ToString(); lblPara.Text = oyuncuPara.ToString(); lblDalga.Text = dalgaSayisi.ToString(); } catch { }
+            try
+            {
+                lblCan.Text = oyuncuCan.ToString();
+                lblPara.Text = oyuncuPara.ToString();
+                lblDalga.Text = dalgaSayisi.ToString();
+                lblSkor.Text = "Skor: " + skor.ToString();
+            }
+            catch { }
         }
 
         // --- BOŞ METOTLAR (SİLME) ---
@@ -325,6 +363,11 @@ namespace kuleSavunma
         private void label1_Click_1(object sender, EventArgs e)
         {
 
+        }
+
+        private void pictureBox6_Click(object sender, EventArgs e)
+        {
+            KuleSec("LazerKulesi");
         }
     }
 }

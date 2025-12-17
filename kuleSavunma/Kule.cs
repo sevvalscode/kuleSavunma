@@ -14,7 +14,7 @@ namespace kuleSavunma
         public Color Renk; // YENİ: Hangi renk olacak?
     }
 
-    public abstract class Kule
+    public abstract class Kule : ISaldirabilir
     {
         public int Hasar { get; set; }
         public int Menzil { get; set; }

@@ -103,6 +103,16 @@ namespace kuleSavunma.Properties {
         /// <summary>
         ///   System.Drawing.Bitmap türünde yerelleştirilmiş bir kaynak arar.
         /// </summary>
+        internal static System.Drawing.Bitmap LazerKulesiResmi {
+            get {
+                object obj = ResourceManager.GetObject("LazerKulesiResmi", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap türünde yerelleştirilmiş bir kaynak arar.
+        /// </summary>
         internal static System.Drawing.Bitmap OkKulesi {
             get {
                 object obj = ResourceManager.GetObject("OkKulesi", resourceCulture);

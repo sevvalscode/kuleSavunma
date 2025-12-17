@@ -233,8 +233,8 @@ namespace kuleSavunma
             if (secilenKuleTuru == "OkKulesi" && oyuncuPara >= 100) yeniKule = new OkKulesi();
             else if (secilenKuleTuru == "BuyuKulesi" && oyuncuPara >= 150) yeniKule = new BuyuKulesi();
             else if (secilenKuleTuru == "TopKulesi" && oyuncuPara >= 200) yeniKule = new TopKulesi();
-
-            if (yeniKule != null)
+            else if (secilenKuleTuru == "LazerKulesi" && oyuncuPara >= 250) yeniKule = new LazerKulesi();
+                if (yeniKule != null)
             {
                 yeniKule.Resim.Location = new Point(e.X - 45, e.Y - 45);
                 this.Controls.Add(yeniKule.Resim);
@@ -250,10 +250,8 @@ namespace kuleSavunma
                 this.Cursor = Cursors.Default;
                 this.Invalidate();
             }
-            else if (secilenKuleTuru == "LazerKulesi" && oyuncuPara >= 250)
-            {
-                yeniKule = new LazerKulesi();
-            }
+           
+          
             else
             {
                 MessageBox.Show("Yeterli paran yok!");

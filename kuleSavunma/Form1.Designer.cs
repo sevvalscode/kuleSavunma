@@ -204,6 +204,7 @@
             pictureBox5.TabIndex = 2;
             pictureBox5.TabStop = false;
             toolTip1.SetToolTip(pictureBox5, "Top Kulesi | Hasar: 50 | Fiyat: 250 Altın");
+            pictureBox5.Click += btnKuleTop_Click;
             // 
             // pictureBox4
             // 
@@ -215,6 +216,7 @@
             pictureBox4.TabIndex = 1;
             pictureBox4.TabStop = false;
             toolTip1.SetToolTip(pictureBox4, "Büyü Kulesi | Hasar: 25 | Fiyat: 200 Altın");
+            pictureBox4.Click += btnKuleBuyu_Click;
             // 
             // pictureBox3
             // 
@@ -226,6 +228,7 @@
             pictureBox3.TabIndex = 0;
             pictureBox3.TabStop = false;
             toolTip1.SetToolTip(pictureBox3, "Ok Kulesi | Hasar: 15 | Fiyat: 100 Altın");
+            pictureBox3.Click += btnKuleOkcu_Click;
             // 
             // btnBaslat
             // 

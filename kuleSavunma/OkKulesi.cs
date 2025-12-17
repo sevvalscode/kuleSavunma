@@ -1,29 +1,40 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace kuleSavunma
 {
-    // Artık OkKulesi, babası olan Kule'nin tüm özelliklerine (Hasar, Fiyat vb.) sahip oldu.
     public class OkKulesi : Kule
     {
-        // Yapıcı Metot: Ok kulesi yaratılırken babasına (base) şu değerleri gönderiyoruz:
         public OkKulesi() : base(15, 150, 100)
         {
             Resim = new PictureBox();
-            Resim.Size = new Size(50, 50);
+            Resim.Size = new Size(90, 90);
             Resim.SizeMode = PictureBoxSizeMode.StretchImage;
             Resim.BackColor = Color.Transparent;
 
-            // İŞTE BURASI: Artık yorum satırı değil, gerçek kod!
+            // DÜZELTİLDİ: Gerçek isim
             Resim.Image = Properties.Resources.OkKulesi;
+
+            this.AtisHizi = 1000;
         }
 
-        // Babada "abstract" olan Saldir metodunu burada doldurmak ZORUNDAYIZ.
-        // "override" kelimesi "Babadaki kuralı uyguluyorum" demektir.
-        public override void Saldir()
+        public override void Saldir(List<Canavar> canavarlar)
         {
-            // BURAYA SONRA KOD YAZACAĞIZ.
-            // Şimdilik boş kalsın, hata vermesin yeter.
+            if ((DateTime.Now - SonAtisZamani).TotalMilliseconds < AtisHizi) return;
+
+            foreach (Canavar c in canavarlar)
+            {
+                double mesafe = Math.Sqrt(Math.Pow(c.Resim.Left - Resim.Left, 2) + Math.Pow(c.Resim.Top - Resim.Top, 2));
+
+                if (mesafe <= Menzil)
+                {
+                    c.Can -= Hasar;
+                    SonAtisZamani = DateTime.Now;
+                    break;
+                }
+            }
         }
     }
 }

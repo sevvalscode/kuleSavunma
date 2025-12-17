@@ -1,78 +1,64 @@
 ﻿using System;
-using System.Drawing;       // Resim ve Boyut işlemleri için
-using System.Windows.Forms; // PictureBox için
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace kuleSavunma
 {
     public class Canavar
     {
-        // --- ÖZELLİKLER ---
         public int Can { get; set; }
         public int Hiz { get; set; }
-        public int AltinDegeri { get; set; } // Ölünce kazandıracağı para
-        public string TurAdi { get; set; }   // "Golem", "Ejderha" vb.
+        public int AltinDegeri { get; set; }
+        public string TurAdi { get; set; }
 
-        public PictureBox Resim { get; set; } // Ekrandaki görüntüsü
-        public int HedefNoktaIndeksi { get; set; } // Yolda kaçıncı virajda?
+        public PictureBox Resim { get; set; }
+        public int HedefNoktaIndeksi { get; set; }
 
-        // Ölü kontrolü için pratik özellik
         public bool OlduMu { get { return Can <= 0; } }
 
-        // --- SİHİRLİ YAPICI METOT (Constructor) ---
-        // Biz sadece türünü söyleyeceğiz (örn: "Golem"), o geri kalanı halledecek.
         public Canavar(string tur)
         {
             this.TurAdi = tur;
-            this.HedefNoktaIndeksi = 0; // Yolun başından başla
+            this.HedefNoktaIndeksi = 0;
 
-            // Görsel Kutuyu Hazırla
             Resim = new PictureBox();
-            Resim.SizeMode = PictureBoxSizeMode.StretchImage; // Resim kutuya sığsın
-            Resim.BackColor = Color.Transparent; // Arka plan şeffaf olsun
+            Resim.SizeMode = PictureBoxSizeMode.StretchImage;
+            Resim.BackColor = Color.Transparent;
 
-            // TÜRÜNE GÖRE AYARLARI YAP (Switch-Case)
             switch (tur)
             {
-                case "AtesRuhu": // Hızlı, Zayıf, Küçük
+                case "AtesRuhu":
                     this.Can = 20;
-                    this.Hiz = 6;     // Çok hızlı
+                    this.Hiz = 6;
                     this.AltinDegeri = 10;
-                    Resim.Size = new Size(30, 30); // Küçük
-                    // Eğer resmin yoksa hata vermemesi için kontrol:
-                    // Resim.Image = Properties.Resources.atesruhu; 
-                    // (Resimlerin Resources içinde ekli olduğunu varsayıyorum, değilse renk verebiliriz)
+                    Resim.Size = new Size(30, 30);
+                    // DÜZELTİLDİ: Resources.Designer.cs içindeki gerçek isim
                     Resim.Image = Properties.Resources.atesruhu;
-                   
-                  break;
+                    break;
 
-                case "Golem": // Yavaş, Tank, Orta Boy
+                case "Golem":
                     this.Can = 100;
-                    this.Hiz = 2;     // Yavaş
+                    this.Hiz = 2;
                     this.AltinDegeri = 30;
                     Resim.Size = new Size(50, 50);
+                    // DÜZELTİLDİ: Resources.Designer.cs içindeki gerçek isim
                     Resim.Image = Properties.Resources.golem;
                     break;
-                case "Ejderha": // BOSS, Büyük
+
+                case "Ejderha":
                     this.Can = 250;
-                    this.Hiz = 3;     // Normal
+                    this.Hiz = 3;
                     this.AltinDegeri = 100;
-                    Resim.Size = new Size(70, 60); // Büyük
+                    Resim.Size = new Size(70, 60);
+                    // DÜZELTİLDİ: Resources.Designer.cs içindeki gerçek isim
                     Resim.Image = Properties.Resources.ejderha;
                     break;
             }
         }
 
-        // Kule vurunca can azaltma
         public void HasarAl(int hasar)
         {
             this.Can -= hasar;
-        }
-
-        // Yardımcı Metot: Resim var mı diye kontrol eder (Hata almanı engeller)
-        private bool KutuphaneVarMi(string ad)
-        {
-            var kaynak = Properties.Resources.ResourceManager.GetObject(ad);
-            return kaynak != null;
         }
     }
 }

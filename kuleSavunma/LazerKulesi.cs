@@ -9,7 +9,7 @@ namespace kuleSavunma
     // Özellikleri: Çok Yüksek Menzil, Yüksek Hasar, ama Yavaş Atış Hızı.
     public class LazerKulesi : Kule
     {
-        public LazerKulesi() : base(60, 220, 350) 
+        public LazerKulesi() : base(60, 200, 350) 
         {
             Resim = new PictureBox();
             Resim.Size = new Size(100, 100);

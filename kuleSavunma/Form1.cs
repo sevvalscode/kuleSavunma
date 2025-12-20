@@ -15,15 +15,14 @@ namespace kuleSavunma
         List<string> dalgaKuyrugu = new List<string>();
         List<Kule> kuleler = new List<Kule>();
 
-        // YENİ: Ekranda görünen mermi/lazer efektleri
         List<AtisEfekti> aktifEfektler = new List<AtisEfekti>();
 
         System.Windows.Forms.Timer oyunTimer = new System.Windows.Forms.Timer();
         System.Windows.Forms.Timer dogmaTimer = new System.Windows.Forms.Timer();
 
-        int baslangicCani = 15;
+        int baslangicCani = 10;
         int baslangicParasi = 350;
-
+        const int TOPLAM_DALGA = 6;
         int oyuncuCan;
         int oyuncuPara;
         int dalgaSayisi = 0;
@@ -31,7 +30,8 @@ namespace kuleSavunma
 
         string secilenKuleTuru = "";
         Kule hoverlananKule = null;
-        int skor = 0; // Skor değişkeni
+        int skor = 0;
+        bool oyunDuraklatildi = false;
 
         public Form1()
         {
@@ -82,63 +82,124 @@ namespace kuleSavunma
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
-            // Sadece bir kule seçiliyse ekranı yenile, aksi takdirde işlem yapma.
-            // Ayrıca performans için sadece kule yerleştirme modundayken çalışsın.
+            // Kule yerleştirme modu varsa zaten ekran yenileniyor
             if (secilenKuleTuru != "")
             {
                 this.Invalidate();
+                return;
             }
+
+            // Mouse'un altında bir kule var mı diye kontrol et
+            bool birKuleyeDegdi = false;
+            Kule bulunanKule = null;
+
+            foreach (var kule in kuleler)
+            {
+                if (kule.Resim.Bounds.Contains(e.Location))
+                {
+                    birKuleyeDegdi = true;
+                    bulunanKule = kule;
+                    break;
+                }
+            }
+
+            if (birKuleyeDegdi)
+            {
+                this.Cursor = Cursors.Hand;
+                hoverlananKule = bulunanKule;
+            }
+            else
+            {
+                this.Cursor = Cursors.Default;
+                hoverlananKule = null;
+            }
+
+            // Sadece durum değiştiyse ekranı yenile (Performans için)
+            this.Invalidate();
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
 
-            // 1. MENZİL GÖSTERGELERİ
+            // --- 1. ÇİZİM LİSTESİ HAZIRLA ---
+            // Tüm kuleleri ve canavarları ortak bir listeye alıyoruz
+            var cizilecekler = new List<PictureBox>();
+
+            foreach (var k in kuleler) cizilecekler.Add(k.Resim);
+            foreach (var c in canavarlar) cizilecekler.Add(c.Resim);
+
+            // --- 2. SIRALAMA (Z-ORDER) ---
+            // Y (Top) değerine göre sırala. Yukarıdakiler önce, aşağıdakiler sonra çizilsin.
+            // Böylece aşağıda duran nesne, yukarıdakinin önünde görünür (2.5D Efekti).
+            cizilecekler.Sort((p1, p2) =>
+            {
+                int y1 = p1.Location.Y + p1.Height;
+                int y2 = p2.Location.Y + p2.Height;
+                return y1.CompareTo(y2);
+            });
+
+            // --- 3. ÇİZİM ---
+            foreach (var p in cizilecekler)
+            {
+                // DrawImage gerçek şeffaflığı destekler!
+                if (p.Image != null)
+                {
+                    g.DrawImage(p.Image, p.Bounds);
+                }
+            }
+
+            // --- 4. MENZİL GÖSTERGELERİ (Mevcut kodun) ---
             if (secilenKuleTuru != "")
             {
-                int menzil = (secilenKuleTuru == "OkKulesi") ? 150 : (secilenKuleTuru == "BuyuKulesi" ? 120 : 100);
+                // ... (Senin mevcut menzil kodların buraya) ...
+                int menzil = 100; // Örnek varsayılan
+                if (secilenKuleTuru == "OkKulesi") menzil = 150;
+                else if (secilenKuleTuru == "BuyuKulesi") menzil = 130;
+                else if (secilenKuleTuru == "TopKulesi") menzil = 120;
+
                 Point mouseYeri = this.PointToClient(Cursor.Position);
                 MenzilCiz(g, mouseYeri, menzil, Color.White);
             }
+
+            // Yere konmuş kule menzili
             if (hoverlananKule != null)
             {
-                Point kuleMerkezi = new Point(hoverlananKule.Resim.Location.X + 45, hoverlananKule.Resim.Location.Y + 45);
+                Point kuleMerkezi = new Point(
+                    hoverlananKule.Resim.Location.X + (hoverlananKule.Resim.Width / 2),
+                    hoverlananKule.Resim.Location.Y + (hoverlananKule.Resim.Height / 2));
                 MenzilCiz(g, kuleMerkezi, hoverlananKule.Menzil, Color.Cyan);
             }
 
-
-            // GÜNCEL KOD (Her efektin kendi rengini kullanır)
+            // --- 5. EFEKTLER (Mevcut kodun) ---
             foreach (var efekt in aktifEfektler)
             {
-                // efekt.Renk özelliğini kullanarak kalemi oluşturuyoruz
                 using (Pen lazerKalemi = new Pen(efekt.Renk, 3))
                 {
                     g.DrawLine(lazerKalemi, efekt.Baslangic, efekt.Bitis);
                 }
             }
 
-            // 3. YENİ: CAN BARLARINI ÇİZ
+            // --- 6. CAN BARLARI (Canavarların üstüne çizilmeli) ---
             foreach (var c in canavarlar)
             {
-                // Canavarın hemen üstüne
                 int barX = c.Resim.Location.X;
                 int barY = c.Resim.Location.Y - 10;
                 int barGenislik = c.Resim.Width;
                 int barYukseklik = 5;
 
-                // Arkaplan (Kırmızı)
                 g.FillRectangle(Brushes.Red, barX, barY, barGenislik, barYukseklik);
-
-                // Kalan Can (Yeşil)
                 float oran = (float)c.Can / (float)c.BaslangicCani;
                 if (oran < 0) oran = 0;
                 int yesilGenislik = (int)(barGenislik * oran);
-
                 g.FillRectangle(Brushes.LimeGreen, barX, barY, yesilGenislik, barYukseklik);
-
-                // İnce siyah çerçeve
                 g.DrawRectangle(Pens.Black, barX, barY, barGenislik, barYukseklik);
+            }
+
+            // --- 7. DURAKLATMA YAZISI ---
+            if (oyunDuraklatildi)
+            {
+                // ... (Mevcut duraklatma kodun) ...
             }
         }
 
@@ -180,7 +241,7 @@ namespace kuleSavunma
                 if (c.Can <= 0)
                 {
                     oyuncuPara += c.AltinDegeri;
-                    skor += 10;
+                    skor += c.SkorDegeri;
 
                     this.Controls.Remove(c.Resim);
                     canavarlar.RemoveAt(i);
@@ -215,6 +276,7 @@ namespace kuleSavunma
                 if (dalgaSayisi < 6) DalgaBaslat(dalgaSayisi + 1);
                 else OyunBitti("TEBRİKLER! TÜM DALGALARI PÜSKÜRTTÜN!", "YENİDEN OYNA");
             }
+            DerinlikSiralamasiYap();
         }
 
         // ==================================================
@@ -227,30 +289,48 @@ namespace kuleSavunma
 
         private void Form1_MouseClick(object sender, MouseEventArgs e)
         {
-            if (secilenKuleTuru == "") return;
-            Kule yeniKule = null;
-            if (secilenKuleTuru == "OkKulesi" && oyuncuPara >= 100) yeniKule = new OkKulesi();
-            else if (secilenKuleTuru == "BuyuKulesi" && oyuncuPara >= 150) yeniKule = new BuyuKulesi();
-            else if (secilenKuleTuru == "TopKulesi" && oyuncuPara >= 200) yeniKule = new TopKulesi();
-            else if (secilenKuleTuru == "LazerKulesi" && oyuncuPara >= 250) yeniKule = new LazerKulesi();
-                if (yeniKule != null)
+            // YENİ: SAĞ TIK İLE İPTAL ETME
+            if (e.Button == MouseButtons.Right)
             {
+                if (secilenKuleTuru != "")
+                {
+                    secilenKuleTuru = "";
+                    this.Cursor = Cursors.Default;
+                    this.Invalidate(); // Ekranı temizle (menzil dairesi gitsin)
+                    return;
+                }
+            }
+
+            // Sol tık işlemleri (Mevcut mantık)
+            if (secilenKuleTuru == "" || e.Button != MouseButtons.Left) return;
+
+            Kule yeniKule = null;
+            // Kule oluşturma mantığı aynı kalacak...
+            if (secilenKuleTuru == "OkKulesi" && oyuncuPara >= 100) yeniKule = new OkKulesi();
+            else if (secilenKuleTuru == "BuyuKulesi" && oyuncuPara >= 200) yeniKule = new BuyuKulesi(); 
+            else if (secilenKuleTuru == "TopKulesi" && oyuncuPara >= 250) yeniKule = new TopKulesi();       
+            else if (secilenKuleTuru == "LazerKulesi" && oyuncuPara >= 350) yeniKule = new LazerKulesi();
+
+            if (yeniKule != null)
+            {
+                // Kuleyi ortalayarak koymak için -45 yaptık (resim boyutu 90-100 varsayılıyor)
                 yeniKule.Resim.Location = new Point(e.X - 45, e.Y - 45);
                 this.Controls.Add(yeniKule.Resim);
                 yeniKule.Resim.BringToFront();
                 kuleler.Add(yeniKule);
 
+                // Hover olayları
                 yeniKule.Resim.MouseEnter += (s, args) => { hoverlananKule = yeniKule; this.Invalidate(); };
                 yeniKule.Resim.MouseLeave += (s, args) => { hoverlananKule = null; this.Invalidate(); };
 
                 oyuncuPara -= yeniKule.Fiyat;
                 ArayuzGuncelle();
+
+                // Kuleyi koyduktan sonra seçim devam etsin mi? Genelde etmez.
                 secilenKuleTuru = "";
                 this.Cursor = Cursors.Default;
                 this.Invalidate();
             }
-           
-          
             else
             {
                 MessageBox.Show("Yeterli paran yok!");
@@ -353,14 +433,12 @@ namespace kuleSavunma
 
         private void ArayuzGuncelle()
         {
-            try
-            {
-                lblCan.Text = oyuncuCan.ToString();
-                lblPara.Text = oyuncuPara.ToString();
-                lblDalga.Text = dalgaSayisi.ToString();
-                lblSkor.Text = "Skor: " + skor.ToString();
-            }
-            catch { }
+            if (lblCan != null) lblCan.Text = oyuncuCan.ToString();
+            if (lblPara != null) lblPara.Text = oyuncuPara.ToString();
+
+            if (lblDalga != null) lblDalga.Text = dalgaSayisi.ToString() + " / " + TOPLAM_DALGA.ToString();
+
+            if (lblSkor != null) lblSkor.Text = skor.ToString();
         }
 
         // --- BOŞ METOTLAR (SİLME) ---
@@ -379,6 +457,88 @@ namespace kuleSavunma
         private void pictureBox6_Click(object sender, EventArgs e)
         {
             KuleSec("LazerKulesi");
+        }
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            // P tuşuna veya ESC tuşuna basınca durdur/devam et
+            if (e.KeyCode == Keys.P || e.KeyCode == Keys.Escape)
+            {
+                OyunDurdurDevamEt();
+            }
+        }
+
+        private void OyunDurdurDevamEt()
+        {
+            if (!oyunBasladiMi) return; // Oyun başlamadıysa durdurma çalışmasın
+
+            if (oyunDuraklatildi)
+            {
+                // Devam Et
+                oyunTimer.Start();
+                dogmaTimer.Start();
+                oyunDuraklatildi = false;
+                // Eğer buton eklediysen metnini güncelle: btnDurdur.Text = "DURDUR";
+            }
+            else
+            {
+                // Durdur
+                oyunTimer.Stop();
+                dogmaTimer.Stop();
+                oyunDuraklatildi = true;
+                // Eğer buton eklediysen metnini güncelle: btnDurdur.Text = "DEVAM ET";
+            }
+            this.Invalidate(); // "OYUN DURAKLATILDI" yazısını çizmek/silmek için
+        }
+        // Bu kod titremeyi (flickering) kökten çözer
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;  // WS_EX_COMPOSITED: Tüm kontrolleri ve formu birlikte çizer
+                return cp;
+            }
+        }
+        private void DerinlikSiralamasiYap()
+        {
+            // 1. Tüm oyun nesnelerini (Kule + Canavar) geçici bir listede topla
+            List<PictureBox> oyunNesneleri = new List<PictureBox>();
+
+            foreach (var kule in kuleler)
+            {
+                oyunNesneleri.Add(kule.Resim);
+            }
+
+            foreach (var canavar in canavarlar)
+            {
+                oyunNesneleri.Add(canavar.Resim);
+            }
+
+            // 2. Y eksenine (Ayak hizasına/Bottom) göre Küçükten Büyüğe sırala.
+            // Mantık: Yukarıdaki (Y'si az) arkada, Aşağıdaki (Y'si çok) önde durmalı.
+            // BringToFront() en son çağrılanı en üste koyduğu için
+            // döngüyü "Arkadakiler -> Öndekiler" sırasıyla çalıştırmalıyız.
+            oyunNesneleri.Sort((p1, p2) =>
+            {
+                int y1 = p1.Location.Y + p1.Height;
+                int y2 = p2.Location.Y + p2.Height;
+                return y1.CompareTo(y2); // Küçükten büyüğe sırala
+            });
+
+            // 3. Sırayla öne getir (Z-Order güncelle)
+            foreach (var pb in oyunNesneleri)
+            {
+                pb.BringToFront();
+            }
+
+            // 4. ÖNEMLİ: UI (Arayüz) Panellerini en üste geri al!
+            // Yoksa canavarlar puan tablosunun veya butonların üzerine çıkabilir.
+            // Formundaki panel ve buton isimlerini buraya yaz:
+            if (panel1 != null) panel1.BringToFront(); // Üst bilgi paneli
+            if (panel2 != null) panel2.BringToFront(); // Dalga paneli
+            if (panel3 != null) panel3.BringToFront(); // Skor paneli
+            if (panel4 != null) panel4.BringToFront(); // Alt buton paneli
+            if (btnBaslat != null) btnBaslat.BringToFront(); // Başlat butonu
         }
     }
 }

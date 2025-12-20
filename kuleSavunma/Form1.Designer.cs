@@ -40,7 +40,6 @@
             label3 = new Label();
             panel3 = new Panel();
             lblSkor = new Label();
-            label4 = new Label();
             panel4 = new Panel();
             pictureBox6 = new PictureBox();
             pictureBox5 = new PictureBox();
@@ -164,10 +163,9 @@
             // panel3
             // 
             panel3.BackColor = Color.White;
-            panel3.BackgroundImage = Properties.Resources.buton;
-            panel3.BackgroundImageLayout = ImageLayout.Center;
+            panel3.BackgroundImage = (Image)resources.GetObject("panel3.BackgroundImage");
+            panel3.BackgroundImageLayout = ImageLayout.Stretch;
             panel3.Controls.Add(lblSkor);
-            panel3.Controls.Add(label4);
             panel3.Location = new Point(49, 82);
             panel3.Name = "panel3";
             panel3.Size = new Size(138, 35);
@@ -179,25 +177,12 @@
             lblSkor.BackColor = Color.Transparent;
             lblSkor.Font = new Font("Stencil", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblSkor.ForeColor = SystemColors.Control;
-            lblSkor.Location = new Point(70, 9);
+            lblSkor.Location = new Point(46, 9);
             lblSkor.Name = "lblSkor";
             lblSkor.Size = new Size(29, 20);
             lblSkor.TabIndex = 3;
             lblSkor.Text = "12";
             lblSkor.Click += label1_Click_1;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.BackColor = Color.Transparent;
-            label4.Enabled = false;
-            label4.Font = new Font("Showcard Gothic", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label4.ForeColor = SystemColors.ButtonFace;
-            label4.Location = new Point(16, 9);
-            label4.Name = "label4";
-            label4.Size = new Size(48, 18);
-            label4.TabIndex = 0;
-            label4.Text = "skor";
             // 
             // panel4
             // 
@@ -306,6 +291,7 @@
             Text = "Form1";
             toolTip1.SetToolTip(this, " ");
             Load += Form1_Load;
+            KeyDown += Form1_KeyDown;
             MouseClick += Form1_MouseClick;
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
@@ -333,7 +319,6 @@
         private PictureBox pictureBox2;
         private Label label3;
         private Panel panel3;
-        private Label label4;
         private Panel panel4;
         private PictureBox pictureBox5;
         private PictureBox pictureBox4;

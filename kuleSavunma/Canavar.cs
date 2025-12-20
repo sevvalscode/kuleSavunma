@@ -7,10 +7,11 @@ namespace kuleSavunma
     public class Canavar
     {
         public int Can { get; set; }
-        public int BaslangicCani { get; set; } // YENİ: Bar çizimi için gerekli
+        public int BaslangicCani { get; set; } 
         public int Hiz { get; set; }
         public int AltinDegeri { get; set; }
         public string TurAdi { get; set; }
+        public int SkorDegeri { get; set; }
 
         public PictureBox Resim { get; set; }
         public int HedefNoktaIndeksi { get; set; }
@@ -30,10 +31,11 @@ namespace kuleSavunma
             {
                 case "AtesRuhu":
                     this.Can = 20;
-                    this.BaslangicCani = 20; // YENİ
-                    this.Hiz = 6;
+                    this.BaslangicCani = 20; 
+                    this.Hiz = 7;
                     this.AltinDegeri = 10;
-                    Resim.Size = new Size(30, 30);
+                    Resim.Size = new Size(40, 40);
+                    this.SkorDegeri = 10;
                     Resim.Image = Properties.Resources.atesruhu;
                     break;
 
@@ -42,6 +44,7 @@ namespace kuleSavunma
                     this.BaslangicCani = 100; // YENİ
                     this.Hiz = 2;
                     this.AltinDegeri = 30;
+                    this.SkorDegeri = 50;
                     Resim.Size = new Size(50, 50);
                     Resim.Image = Properties.Resources.golem;
                     break;
@@ -50,8 +53,9 @@ namespace kuleSavunma
                     this.Can = 250;
                     this.BaslangicCani = 250; // YENİ
                     this.Hiz = 3;
-                    this.AltinDegeri = 100;
-                    Resim.Size = new Size(70, 60);
+                    this.AltinDegeri = 75;
+                    this.SkorDegeri = 100;
+                    Resim.Size = new Size(80, 80);
                     Resim.Image = Properties.Resources.ejderha;
                     break;
             }

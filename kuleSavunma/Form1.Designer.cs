@@ -42,22 +42,22 @@
             lblSkor = new Label();
             label4 = new Label();
             panel4 = new Panel();
+            pictureBox6 = new PictureBox();
             pictureBox5 = new PictureBox();
             pictureBox4 = new PictureBox();
             pictureBox3 = new PictureBox();
             toolTip1 = new ToolTip(components);
             btnBaslat = new Button();
-            pictureBox6 = new PictureBox();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
             panel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
             SuspendLayout();
             // 
             // panel1
@@ -164,8 +164,8 @@
             // panel3
             // 
             panel3.BackColor = Color.White;
-            panel3.BackgroundImage = (Image)resources.GetObject("panel3.BackgroundImage");
-            panel3.BackgroundImageLayout = ImageLayout.Stretch;
+            panel3.BackgroundImage = Properties.Resources.buton;
+            panel3.BackgroundImageLayout = ImageLayout.Center;
             panel3.Controls.Add(lblSkor);
             panel3.Controls.Add(label4);
             panel3.Location = new Point(49, 82);
@@ -206,17 +206,31 @@
             panel4.Controls.Add(pictureBox5);
             panel4.Controls.Add(pictureBox4);
             panel4.Controls.Add(pictureBox3);
-            panel4.Location = new Point(21, 632);
+            panel4.Location = new Point(12, 632);
             panel4.Name = "panel4";
             panel4.Size = new Size(339, 77);
             panel4.TabIndex = 3;
             panel4.Paint += panel4_Paint;
             // 
+            // pictureBox6
+            // 
+            pictureBox6.BackgroundImage = (Image)resources.GetObject("pictureBox6.BackgroundImage");
+            pictureBox6.BackgroundImageLayout = ImageLayout.Zoom;
+            pictureBox6.Cursor = Cursors.Hand;
+            pictureBox6.Location = new Point(243, 0);
+            pictureBox6.Name = "pictureBox6";
+            pictureBox6.Size = new Size(74, 70);
+            pictureBox6.TabIndex = 3;
+            pictureBox6.TabStop = false;
+            toolTip1.SetToolTip(pictureBox6, "Lazer Kulesi (350 Altın)");
+            pictureBox6.Click += pictureBox6_Click;
+            // 
             // pictureBox5
             // 
             pictureBox5.BackgroundImage = (Image)resources.GetObject("pictureBox5.BackgroundImage");
             pictureBox5.BackgroundImageLayout = ImageLayout.Zoom;
-            pictureBox5.Location = new Point(195, 3);
+            pictureBox5.Cursor = Cursors.Hand;
+            pictureBox5.Location = new Point(163, 0);
             pictureBox5.Name = "pictureBox5";
             pictureBox5.Size = new Size(74, 70);
             pictureBox5.TabIndex = 2;
@@ -228,7 +242,8 @@
             // 
             pictureBox4.BackgroundImage = (Image)resources.GetObject("pictureBox4.BackgroundImage");
             pictureBox4.BackgroundImageLayout = ImageLayout.Zoom;
-            pictureBox4.Location = new Point(101, 3);
+            pictureBox4.Cursor = Cursors.Hand;
+            pictureBox4.Location = new Point(83, 0);
             pictureBox4.Name = "pictureBox4";
             pictureBox4.Size = new Size(74, 70);
             pictureBox4.TabIndex = 1;
@@ -240,7 +255,8 @@
             // 
             pictureBox3.BackgroundImage = (Image)resources.GetObject("pictureBox3.BackgroundImage");
             pictureBox3.BackgroundImageLayout = ImageLayout.Zoom;
-            pictureBox3.Location = new Point(3, 3);
+            pictureBox3.Cursor = Cursors.Hand;
+            pictureBox3.Location = new Point(3, 0);
             pictureBox3.Name = "pictureBox3";
             pictureBox3.Size = new Size(74, 70);
             pictureBox3.TabIndex = 0;
@@ -250,25 +266,23 @@
             // 
             // btnBaslat
             // 
+            btnBaslat.BackColor = Color.Transparent;
+            btnBaslat.BackgroundImage = Properties.Resources.buton;
+            btnBaslat.BackgroundImageLayout = ImageLayout.Stretch;
+            btnBaslat.CausesValidation = false;
+            btnBaslat.Cursor = Cursors.Hand;
+            btnBaslat.FlatAppearance.BorderSize = 0;
+            btnBaslat.FlatAppearance.MouseDownBackColor = Color.Transparent;
+            btnBaslat.FlatAppearance.MouseOverBackColor = Color.Transparent;
+            btnBaslat.FlatStyle = FlatStyle.Flat;
+            btnBaslat.ForeColor = SystemColors.ButtonFace;
             btnBaslat.Location = new Point(549, 580);
             btnBaslat.Name = "btnBaslat";
-            btnBaslat.Size = new Size(338, 122);
+            btnBaslat.Size = new Size(385, 113);
             btnBaslat.TabIndex = 4;
-            btnBaslat.Text = "button1";
-            btnBaslat.UseVisualStyleBackColor = true;
+            btnBaslat.Text = "OYUNA BAŞLA";
+            btnBaslat.UseVisualStyleBackColor = false;
             btnBaslat.Click += btnBaslat_Click;
-            // 
-            // pictureBox6
-            // 
-            pictureBox6.BackgroundImage = (Image)resources.GetObject("pictureBox6.BackgroundImage");
-            pictureBox6.BackgroundImageLayout = ImageLayout.Zoom;
-            pictureBox6.Location = new Point(275, 3);
-            pictureBox6.Name = "pictureBox6";
-            pictureBox6.Size = new Size(74, 70);
-            pictureBox6.TabIndex = 3;
-            pictureBox6.TabStop = false;
-            toolTip1.SetToolTip(pictureBox6, "Lazer Kulesi (250 Altın)");
-            pictureBox6.Click += pictureBox6_Click;
             // 
             // Form1
             // 
@@ -284,6 +298,7 @@
             Controls.Add(panel2);
             Controls.Add(panel1);
             DoubleBuffered = true;
+            ForeColor = Color.Transparent;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "Form1";
@@ -301,10 +316,10 @@
             panel3.ResumeLayout(false);
             panel3.PerformLayout();
             panel4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
             ResumeLayout(false);
         }
 

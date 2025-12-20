@@ -21,8 +21,8 @@ namespace kuleSavunma
         System.Windows.Forms.Timer oyunTimer = new System.Windows.Forms.Timer();
         System.Windows.Forms.Timer dogmaTimer = new System.Windows.Forms.Timer();
 
-        int baslangicCani = 20;
-        int baslangicParasi = 600;
+        int baslangicCani = 15;
+        int baslangicParasi = 350;
 
         int oyuncuCan;
         int oyuncuPara;
@@ -179,7 +179,6 @@ namespace kuleSavunma
                 // ÖLÜM KONTROLÜ
                 if (c.Can <= 0)
                 {
-                    // ALTIN BUG'I ÇÖZÜMÜ: Sadece burada ve bir kere eklenir.
                     oyuncuPara += c.AltinDegeri;
                     skor += 10;
 
@@ -263,46 +262,60 @@ namespace kuleSavunma
 
         private void btnBaslat_Click(object sender, EventArgs e)
         {
-            if (!oyunBasladiMi)
+            // --- DURUM 1: OYUN BİTTİ VE RESETLEMEK İSTİYORSUN ---
+            // Bu blok çalıştığında oyun hemen başlamaz, sadece "Hazırlık Moduna" döner.
+            if (btnBaslat.Text == "TEKRAR DENE" || btnBaslat.Text == "YENİDEN OYNA")
             {
-                oyunBasladiMi = true;
-
-                // --- DÜZELTME BAŞLANGICI ---
-                // Eğer bu bir "YENİDEN BAŞLATMA" ise her şeyi sıfırla.
-                if (btnBaslat.Text == "TEKRAR DENE" || btnBaslat.Text == "YENİDEN OYNA")
-                {
-                    oyuncuCan = baslangicCani;
-                    oyuncuPara = baslangicParasi;
-
-                    // Yeniden başlatırken ekrandaki eski kuleleri de silmeliyiz!
-                    foreach (var kule in kuleler)
-                    {
-                        this.Controls.Remove(kule.Resim);
-                    }
-                    kuleler.Clear();
-                }
-                else
-                {
-                    // Oyun İLK KEZ başlıyorsa parayı SIFIRLAMA. 
-                    // Kullanıcı kule koyup parayı harcamış olabilir, olduğu gibi kalsın.
-                }
-                // --- DÜZELTME BİTİŞİ ---
-
+                // 1. Değişkenleri ve Parayı Sıfırla
+                oyuncuCan = baslangicCani;
+                oyuncuPara = baslangicParasi;
                 dalgaSayisi = 0;
+                oyunBasladiMi = false; // Oyun akışını durduruyoruz.
 
-                foreach (var c in canavarlar) this.Controls.Remove(c.Resim);
+                // 2. Ekrandaki Eski Kuleleri Temizle
+                foreach (var kule in kuleler)
+                {
+                    this.Controls.Remove(kule.Resim);
+                }
+                kuleler.Clear();
+
+                // 3. Ekrandaki Eski Canavarları Temizle
+                foreach (var c in canavarlar)
+                {
+                    this.Controls.Remove(c.Resim);
+                }
                 canavarlar.Clear();
                 dalgaKuyrugu.Clear();
                 aktifEfektler.Clear();
 
+                // 4. Timer'ları Durdur (Garanti olsun)
+                oyunTimer.Stop();
+                dogmaTimer.Stop();
+
+                // 5. Arayüzü Güncelle (Paranın geri geldiğini gör)
                 ArayuzGuncelle();
+
+                // 6. Butonu Hazır Hale Getir
+                // Artık buton "BAŞLAT" oldu. Sen kulelerini koyduktan sonra buna basacaksın.
+                btnBaslat.Text = "BAŞLAT";
+                btnBaslat.Visible = true;
+            }
+
+            // --- DURUM 2: HAZIRLIK BİTTİ, OYUNU BAŞLATIYORSUN ---
+            // Burası sadece buton "BAŞLAT" ise çalışır.
+            else if (!oyunBasladiMi)
+            {
+                oyunBasladiMi = true;
+
+                // Butonu gizle veya "Oyun Başladı" yap
                 btnBaslat.Visible = false;
+
+                // Zamanlayıcıları ve Dalgayı Başlat
                 oyunTimer.Start();
                 dogmaTimer.Start();
-                DalgaBaslat(1);
+                DalgaBaslat(1); // 1. Dalga başlasın
             }
         }
-
         private void DalgaBaslat(int dalga)
         {
             dalgaSayisi = dalga;

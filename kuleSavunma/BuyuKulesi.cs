@@ -10,7 +10,7 @@ namespace kuleSavunma
         public BuyuKulesi() : base(25, 130, 200)
         {
             Resim = new PictureBox();
-            Resim.Size = new Size(90, 90);
+            Resim.Size = new Size(100, 100);
             Resim.SizeMode = PictureBoxSizeMode.StretchImage;
             Resim.BackColor = Color.Transparent;
             Resim.Image = Properties.Resources.BuyuKulesi;

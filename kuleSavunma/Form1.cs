@@ -196,11 +196,7 @@ namespace kuleSavunma
                 g.DrawRectangle(Pens.Black, barX, barY, barGenislik, barYukseklik);
             }
 
-            // --- 7. DURAKLATMA YAZISI ---
-            if (oyunDuraklatildi)
-            {
-                // ... (Mevcut duraklatma kodun) ...
-            }
+          
         }
 
         private void MenzilCiz(Graphics g, Point merkez, int menzil, Color renk)
@@ -276,7 +272,7 @@ namespace kuleSavunma
                 if (dalgaSayisi < 6) DalgaBaslat(dalgaSayisi + 1);
                 else OyunBitti("TEBRİKLER! TÜM DALGALARI PÜSKÜRTTÜN!", "YENİDEN OYNA");
             }
-            DerinlikSiralamasiYap();
+           
         }
 
         // ==================================================
@@ -315,8 +311,7 @@ namespace kuleSavunma
             {
                 // Kuleyi ortalayarak koymak için -45 yaptık (resim boyutu 90-100 varsayılıyor)
                 yeniKule.Resim.Location = new Point(e.X - 45, e.Y - 45);
-                this.Controls.Add(yeniKule.Resim);
-                yeniKule.Resim.BringToFront();
+               
                 kuleler.Add(yeniKule);
 
                 // Hover olayları
@@ -412,10 +407,13 @@ namespace kuleSavunma
         private void DogmaTimer_Tick(object sender, EventArgs e)
         {
             if (dalgaKuyrugu.Count <= 0) return;
+
             Canavar yeni = new Canavar(dalgaKuyrugu[0]);
             yeni.Resim.Location = yolNoktalari[0];
-            this.Controls.Add(yeni.Resim);
-            yeni.Resim.BringToFront();
+
+            // BU SATIRI SİLDİK: this.Controls.Add(yeni.Resim); 
+            // BU SATIRI DA SİLEBİLİRSİN: yeni.Resim.BringToFront(); (Artık gerek yok)
+
             canavarlar.Add(yeni);
             dalgaKuyrugu.RemoveAt(0);
         }
@@ -499,46 +497,6 @@ namespace kuleSavunma
                 return cp;
             }
         }
-        private void DerinlikSiralamasiYap()
-        {
-            // 1. Tüm oyun nesnelerini (Kule + Canavar) geçici bir listede topla
-            List<PictureBox> oyunNesneleri = new List<PictureBox>();
-
-            foreach (var kule in kuleler)
-            {
-                oyunNesneleri.Add(kule.Resim);
-            }
-
-            foreach (var canavar in canavarlar)
-            {
-                oyunNesneleri.Add(canavar.Resim);
-            }
-
-            // 2. Y eksenine (Ayak hizasına/Bottom) göre Küçükten Büyüğe sırala.
-            // Mantık: Yukarıdaki (Y'si az) arkada, Aşağıdaki (Y'si çok) önde durmalı.
-            // BringToFront() en son çağrılanı en üste koyduğu için
-            // döngüyü "Arkadakiler -> Öndekiler" sırasıyla çalıştırmalıyız.
-            oyunNesneleri.Sort((p1, p2) =>
-            {
-                int y1 = p1.Location.Y + p1.Height;
-                int y2 = p2.Location.Y + p2.Height;
-                return y1.CompareTo(y2); // Küçükten büyüğe sırala
-            });
-
-            // 3. Sırayla öne getir (Z-Order güncelle)
-            foreach (var pb in oyunNesneleri)
-            {
-                pb.BringToFront();
-            }
-
-            // 4. ÖNEMLİ: UI (Arayüz) Panellerini en üste geri al!
-            // Yoksa canavarlar puan tablosunun veya butonların üzerine çıkabilir.
-            // Formundaki panel ve buton isimlerini buraya yaz:
-            if (panel1 != null) panel1.BringToFront(); // Üst bilgi paneli
-            if (panel2 != null) panel2.BringToFront(); // Dalga paneli
-            if (panel3 != null) panel3.BringToFront(); // Skor paneli
-            if (panel4 != null) panel4.BringToFront(); // Alt buton paneli
-            if (btnBaslat != null) btnBaslat.BringToFront(); // Başlat butonu
-        }
+     
     }
 }
